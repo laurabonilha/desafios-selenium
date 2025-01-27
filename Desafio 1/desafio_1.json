@@ -1,0 +1,62 @@
+[
+    {
+        "email": "lda-mota@example.net",
+        "senha": "*V03BSlEA*",
+        "data-de-nascimento": "1983-08-27",
+        "newsletter": false
+    },
+    {
+        "email": "sda-luz@example.org",
+        "senha": "Qa8_2C0o5_",
+        "data-de-nascimento": "2003-07-16",
+        "newsletter": true
+    },
+    {
+        "email": "daniela00@example.com",
+        "senha": "zZz4@J3ec@",
+        "data-de-nascimento": "1971-08-24",
+        "newsletter": true
+    },
+    {
+        "email": "nogueiralorenzo@example.com",
+        "senha": "%8h&@B6IgJ",
+        "data-de-nascimento": "1996-08-14",
+        "newsletter": true
+    },
+    {
+        "email": "gcardoso@example.net",
+        "senha": "OAHsP2Eu_h",
+        "data-de-nascimento": "1990-04-20",
+        "newsletter": true
+    },
+    {
+        "email": "lorenzoaragao@example.org",
+        "senha": "240iCRzfO_",
+        "data-de-nascimento": "1998-12-10",
+        "newsletter": true
+    },
+    {
+        "email": "sofia65@example.org",
+        "senha": "!ytSm4@x0w",
+        "data-de-nascimento": "1971-06-01",
+        "newsletter": true
+    },
+    {
+        "email": "joao08@example.com",
+        "senha": "J4d5A5nD)A",
+        "data-de-nascimento": "1954-10-27",
+        "newsletter": false
+    },
+    {
+        "email": "wduarte@example.org",
+        "senha": "$V0TkvNYzd",
+        "data-de-nascimento": "1979-05-02",
+        "newsletter": false
+    },
+    {
+        "email": "mariada-rocha@example.com",
+        "senha": "%0t$9CKq3P",
+        "data-de-nascimento": "2003-09-10",
+        "newsletter": true
+    }
+]
