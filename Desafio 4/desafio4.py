@@ -58,29 +58,31 @@ for item in var_listItensProcessar:
             # Espera aparecer a tabela com os resultados
             wait.until(EC.visibility_of_element_located(locator=(By.XPATH, '//*[@id="root"]/div/div[2]/main/div[2]/div/div/div/div[1]')))
 
-            # Capturando todos os produtos da primeira página
-            var_elementoProdutos = driver.find_elements(By.CSS_SELECTOR, 'form#filtros + div div:has(>img)')
+            while True:
 
-            for produto in var_elementoProdutos:
-                var_strInfoProduto = produto.get_attribute('innerText')
+                # Capturando todos os produtos da primeira página
+                var_elementoProdutos = driver.find_elements(By.CSS_SELECTOR, 'div.border-gray-200.rounded-lg')
 
-             # Aplica Regex para capturar as informações
-            lines = var_strInfoProduto.split('\n')
+                for produto in var_elementoProdutos:
+                    var_strNomeProduto = produto.find_element(By.XPATH, './/h5[contains(@class, "text-xl")]').text
+                    var_strDescricaoProduto = produto.find_element(By.XPATH, '//div[contains(@class, "text-ellipsis") and contains(@class, "line-clamp-3")]').text
+                    var_intPrecoProduto = driver.find_elements(By.XPATH, '//div[@class="grow"]//span[contains(@class, "text-3xl") and contains(@class, "font-bold")]').text
+
+
+                try:
+                    # Verifica se o botão de próxima página está habilitado
+                    var_btnProximaPagina = driver.find_element(By.XPATH, '//*[@id="root"]/div/div[2]/main/div[2]/div/div/div/div[2]/button[2]')
+                    # Se o botão estiver habilitado, encerra o loop
+                    if var_btnProximaPagina.get_attribute('disabled'):
+                        print("Não há mais página para processar")
+                        break
+                    # Se o botão estiver disponível, clica e repete o processo para a próxima página
+                    var_btnProximaPagina.click()
+                except:
+                    break    
+
+
             
-            # Nome do produto é sempre a primeira linha
-            var_strNomeProduto = lines[0].strip() if len(lines) > 0 else None
-            
-            # Verificando se há mais página para buscar
-            var_btnProximaPagina = driver.find_element(By.XPATH, '//*[@id="root"]/div/div[2]/main/div[2]/div/div/div/div[2]/button[2]')
-            var_ultimaPagina = var_btnProximaPagina.get_attribute('disabled')
-
-            # Verifica se é a última página e se não for continua capturando os dados da próximas
-            while not var_ultimaPagina:
-                var_btnProximaPagina.click()
-                produtos = driver.find_elements(By.CSS_SELECTOR, 'form#filtros + div div:has(>img)')
-            
-
-
         
         case 'tvs':
             pass
