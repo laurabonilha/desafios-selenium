@@ -16,6 +16,7 @@ from selenium.webdriver.support.ui import Select #seleção de campos web
 import re
 import pandas as pd
 import time
+import json
 
 driver = webdriver.Chrome()
 # Criando uma variável de espera padrão
@@ -101,7 +102,6 @@ for item in var_listItensProcessar:
                 except:
                     break    
 
-
         case 'tvs':
             #Acessando diretamente a URL das tvs
             driver.get('https://curso-web-scraping.pages.dev/#/desafio/4?categoria=tvs')
@@ -166,10 +166,6 @@ for item in var_listItensProcessar:
                     var_btnProximaPagina.click()
                 except:
                     break    
-
-
-
-
 
         case 'games':
             #Acessando diretamente a URL de games
@@ -239,7 +235,6 @@ for item in var_listItensProcessar:
                     var_btnProximaPagina.click()
                 except:
                     break    
-
 
         case 'notebooks':
             #Acessando diretamente a URL de notebooks
@@ -316,4 +311,6 @@ df_produtosEncontrados = pd.DataFrame(produtosEncontrados)
 
 df_produtosEncontrados.to_excel("produtos.xlsx", index=False)
 
-print("Produtos salvos com sucesso na planilha")
+# Salvando os produtos em JSON
+with open("produtos.json", "w", encoding="utf-8") as arquivo_json:
+    json.dump(produtosEncontrados, arquivo_json, ensure_ascii=False, indent=4)
