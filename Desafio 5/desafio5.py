@@ -81,8 +81,29 @@ while True:
         var_strPrecoMoeda = criptomoeda.find_element(By.XPATH, ".//td[contains(@class, 'tw-text-end') and contains(@class, 'tw-px-1') and contains(@class, 'tw-text-gray-900')]").text
 
         # Captura a variação em 1 hora
-        var_variacao1Hora = criptomoeda.find_element(By.XPATH, ".//span[contains(@class, 'gecko-up')]").text
-        
+        var_elementoVariacao1Hora = criptomoeda.find_element(By.XPATH, ".//span[contains(@class, 'gecko-up') or contains(@class, 'gecko-down')]")
+
+        # Captura o valor da variação em 1 hora
+        var_strVariacao1Hora = var_elementoVariacao1Hora.text.strip().replace("%", "").replace(",", ".")
+
+        # Encontrar o elemento de positivo ou negativo dentro do span
+        var_elementoSinalVariacao = var_elementoVariacao1Hora.find_element(By.XPATH, ".//i[contains(@class, 'fas') and contains(@class, 'fa-fw')]")
+
+        # Verificar se a classe do i é 'fa-caret-up' ou 'fa-caret-down'
+        if 'fa-caret-up' in var_elementoSinalVariacao.get_attribute('class'):
+            indice = 1  # Índice positivo
+        elif 'fa-caret-down' in var_elementoSinalVariacao.get_attribute('class'):
+            indice = -1  # Índice negativo
+        else:
+            indice = 0  # Caso não encontre, assume 0
+
+        # Converter a variação para float e aplicar o sinal
+        try:
+            var_Variacao1Hora = float(var_strVariacao1Hora) * indice
+        except ValueError:
+            var_Variacao1Hora = 0  # Se não conseguir converter, assume 0
+
+
         
 
 
