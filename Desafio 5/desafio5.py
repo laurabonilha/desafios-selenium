@@ -14,6 +14,8 @@ import re
 import pandas as pd
 import time
 import json
+import os
+import requests
 
 driver = webdriver.Chrome()
 # Criando uma variável de espera padrão
@@ -50,6 +52,11 @@ var_linhasCripto = driver.find_elements(By.XPATH, "//tr[contains(@class, 'tw-bg-
 
 while True:
     for criptomoeda in var_linhasCripto:
+
+        # Captura o índice da criptomoeda no site
+        var_elementoIndice = criptomoeda.find_element(By.XPATH, "//td[contains(@class, 'tw-sticky') and contains(@class, '2lg:tw-static') and contains(@class, 'tw-left-[24px]') and contains(@class, 'tw-px-1') and contains(@class, 'tw-py-2.5') and contains(@class, 'tw-bg-inherit') and contains(@class, 'tw-text-gray-900') and contains(@class, 'dark:tw-text-moon-50')]")
+        var_strIndiceMoeda = var_elementoIndice.text
+
         # Captura o nome completo da moeda (incluindo o tipo)
         var_strElementoMoeda = criptomoeda.find_element(By.XPATH, ".//div[contains(@class, 'tw-text-gray-700')]")
         var_strMoedaCompleto = var_strElementoMoeda.text.strip()
@@ -80,19 +87,19 @@ while True:
         # Captura o preço da moeda
         var_strPrecoMoeda = criptomoeda.find_element(By.XPATH, ".//td[contains(@class, 'tw-text-end') and contains(@class, 'tw-px-1') and contains(@class, 'tw-text-gray-900')]").text
 
-        # Captura a variação em 1 hora
-        var_elementoVariacao1Hora = criptomoeda.find_element(By.XPATH, ".//span[contains(@class, 'gecko-up') or contains(@class, 'gecko-down')]")
+        # Encontra o elemento da variação em 1 hora
+        var_elementoVariacao1Hora = criptomoeda.find_element(By.XPATH, ".//span[(contains(@class, 'gecko-up') or contains(@class, 'gecko-down')) and @data-attr='price_change_percentage_1h']")
 
         # Captura o valor da variação em 1 hora
         var_strVariacao1Hora = var_elementoVariacao1Hora.text.strip().replace("%", "").replace(",", ".")
 
         # Encontrar o elemento de positivo ou negativo dentro do span
-        var_elementoSinalVariacao = var_elementoVariacao1Hora.find_element(By.XPATH, ".//i[contains(@class, 'fas') and contains(@class, 'fa-fw')]")
+        var_elementoSinalVariacao1Hora = var_elementoVariacao1Hora.find_element(By.XPATH, ".//i[contains(@class, 'fas') and contains(@class, 'fa-fw')]")
 
         # Verificar se a classe do i é 'fa-caret-up' ou 'fa-caret-down'
-        if 'fa-caret-up' in var_elementoSinalVariacao.get_attribute('class'):
+        if 'fa-caret-up' in var_elementoSinalVariacao1Hora.get_attribute('class'):
             indice = 1  # Índice positivo
-        elif 'fa-caret-down' in var_elementoSinalVariacao.get_attribute('class'):
+        elif 'fa-caret-down' in var_elementoSinalVariacao1Hora.get_attribute('class'):
             indice = -1  # Índice negativo
         else:
             indice = 0  # Caso não encontre, assume 0
@@ -103,12 +110,89 @@ while True:
         except ValueError:
             var_Variacao1Hora = 0  # Se não conseguir converter, assume 0
 
+        # Captura o elemento da variação em 24 horas
+        var_elementoVariacao24Horas = criptomoeda.find_element(By.XPATH, ".//span[(contains(@class, 'gecko-up') or contains(@class, 'gecko-down')) and @data-attr='price_change_percentage_24h']")
+
+        # Captura o valor da variação em 24 horas
+        var_strVariacao24Horas = var_elementoVariacao24Horas.text.strip().replace("%", "").replace(",", ".")
+
+        # Encontra se a variação em 24 horas é positiva ou negativa
+        var_elementoSinalVariacao24Horas = var_elementoVariacao24Horas.find_element(By.XPATH, ".//i[contains(@class, 'fas') and contains(@class, 'fa-fw')]")
+        
+        # Verificar se a classe do i é 'fa-caret-up' ou 'fa-caret-down'
+        if 'fa-caret-up' in var_elementoSinalVariacao24Horas.get_attribute('class'):
+            indice = 1  # Índice positivo
+        elif 'fa-caret-down' in var_elementoSinalVariacao24Horas.get_attribute('class'):
+            indice = -1  # Índice negativo
+        else:
+            indice = 0  # Caso não encontre, assume 0
+
+        # Converter a variação para float e aplicar o sinal
+        try:
+            var_Variacao24Horas = float(var_strVariacao24Horas) * indice
+        except ValueError:
+            var_Variacao24Horas = 0  # Se não conseguir converter, assume 0
+
+        # Captura o elemento de variação em 7 dias
+        var_elementoVariacao7Dias = criptomoeda.find_element(By.XPATH, ".//span[(contains(@class, 'gecko-up') or contains(@class, 'gecko-down')) and @data-attr='price_change_percentage_7d']")
+        
+        # Captura o valor da variação em 7 dias
+        var_strVariacao7Dias = var_elementoVariacao7Dias.text.strip().replace("%", "").replace(",", ".")
+        
+        # Encontra se a variação em 7 dias é negatia ou positiva
+        var_elementoSinalVariacao7Dias = var_elementoVariacao7Dias.find_element(By.XPATH, ".//i[contains(@class, 'fas') and contains(@class, 'fa-fw')]")
+
+        # Verificar se a classe do i é 'fa-caret-up' ou 'fa-caret-down'
+        if 'fa-caret-up' in var_elementoSinalVariacao7Dias.get_attribute('class'):
+            indice = 1  # Índice positivo
+        elif 'fa-caret-down' in var_elementoSinalVariacao7Dias.get_attribute('class'):
+            indice = -1  # Índice negativo
+        else:
+            indice = 0  # Caso não encontre, assume 0
+
+        # Converter a variação para float e aplicar o sinal
+        try:
+            var_Variacao7Dias = float(var_strVariacao7Dias) * indice
+        except ValueError:
+            var_Variacao7Dias = 0  # Se não conseguir converter, assume 0
+
+        # Encontra o elemento de volume em 24 horas
+        var_elementoVolume = criptomoeda.find_element(By.XPATH, "//td[@class='tw-text-end tw-px-1 tw-py-2.5 2lg:tw-p-2.5 tw-bg-inherit tw-text-gray-900 dark:tw-text-moon-50']")
+        var_strVolume = var_elementoVolume.text
+
+        # Encontra o elemento Capitalização de mercado
+        var_elementoCapitalizacao = criptomoeda.find_element(By.XPATH, "//td[@class='tw-text-end tw-px-1 tw-py-2.5 2lg:tw-p-2.5 tw-bg-inherit tw-text-gray-900 dark:tw-text-moon-50']")
+        var_strCapitalizacao = var_elementoCapitalizacao.text
+
+        # Captura os links da imagens - gráfico últimos 7 dias
+        var_elementoGrafico = criptomoeda.find_element(By.XPATH, "//td[contains(@class, 'tw-text-end') and contains(@class, 'tw-box-content')]//img")
+        var_strLinkGrafico = var_elementoGrafico.get_attribute('src')
+
+        # Salva as imagens dos gráficos numa pasta da automação
+        var_dirGraficos = 'Gráficos'
+
+        # Verifica se a pasta local para salvar os gráficos existe e, se não existir, cria ela
+        if not os.path.exists(var_dirGraficos):
+            os.makedirs(var_dirGraficos)
+
+        # Se existir gráfico, faz o download
+        if var_strLinkGrafico:
+            try:
+                response = requests.get(var_strLinkGrafico, stream=True)
+                response.raise_for_status()  # Verifica se houve erro no download
+
+                # Determinar a extensão do arquivo
+                ext = ".jpg" if "jpeg" in response.headers["Content-Type"] else ".png"
+
+                # Criar o caminho para salvar a imagem
+                caminho_arquivo = os.path.join(var_dirGraficos, f"grafico_{var_strNomeMoeda}{var_strTipoMoeda}")
+
+                # Salvar a imagem no arquivo
+                with open(caminho_arquivo, "wb") as file:
+                    for chunk in response.iter_content(1024):
+                        file.write(chunk)
+
+            except requests.exceptions.RequestException as e:
+                print(f"Erro ao baixar {caminho_arquivo}: {e}")
 
         
-
-
-
-
-        
-
-
